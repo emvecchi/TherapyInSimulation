@@ -1,4 +1,4 @@
-# TherapyInSimulation
+# Therapy in Simulation: Computational Experiments on Interpersonal Dynamics in Psychotherapy
 
 This repository contains transcript annotations, computational discourse analyses, and derived results for simulated psychotherapy dialogues. The project examines how linguistic behavior changes across baseline interaction, alliance rupture, and repair, and how these changes relate to interpersonal ratings such as affiliation and dominance.
 
