@@ -1,0 +1,11 @@
+speaker,annotation,n_total,n_valid,n_missing,n_not_applicable,n_distinct_valid,constant
+Patient,disc_relevance,16,15,0,1,1,True
+Patient,disc_uptake,16,14,2,0,3,False
+Patient,disc_elaboration,16,16,0,0,1,True
+Patient,disc_metacommunication,16,16,0,0,2,False
+Patient,disc_grounding_any,16,13,3,0,2,False
+Therapist,disc_relevance,15,15,0,0,2,False
+Therapist,disc_uptake,15,14,1,0,3,False
+Therapist,disc_elaboration,15,15,0,0,2,False
+Therapist,disc_metacommunication,15,15,0,0,2,False
+Therapist,disc_grounding_any,15,14,1,0,2,False
