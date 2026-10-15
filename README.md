@@ -52,7 +52,6 @@ The analysis distinguishes these interaction states:
 - `Baseline`
 - `Withdrawal`
 - `Confrontation`
-- `Repair`
 
 ## Input data
 
