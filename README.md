@@ -12,31 +12,34 @@ Results are organized by simulated patient. A typical checkout looks like this:
 
 ```text
 .
-├── SimulatedPatient1/
-│   ├── run_discourse_analysis.ipynb
-│   ├── SP1_transcript_psych_discourse_ratings.json
-│   ├── discourse_annotation_audit.csv
-│   ├── discourse_by_clinical_state.csv
-│   ├── discourse_by_speaker.csv
-│   ├── discourse_turn_data.csv
-│   ├── full_discourse_analysis_output.csv
-│   ├── linguistic_annotation_correlations.csv
-│   ├── linguistic_shifts_summary.csv
-│   ├── rupture_response_windows.csv
-│   ├── sequential_response_summary.csv
-│   └── therapist_patient_pairs.csv
-├── SimulatedPatient2/
-│   └── ...
+├── code/
+│   └── run_analysis.ipynb
+├── data/
+│   ├── SimulatedPatient1/
+│   │   ├── SP1_transcript_psych_discourse_ratings.json
+│   │   └── SP1_transcript_psych_discourse_ratings/
+│   │       ├── discourse_annotation_audit.csv
+│   │       ├── discourse_by_clinical_state.csv
+│   │       ├── discourse_by_speaker.csv
+│   │       ├── discourse_turn_data.csv
+│   │       ├── full_discourse_analysis_output.csv
+│   │       ├── linguistic_annotation_correlations.csv
+│   │       ├── linguistic_shifts_summary.csv
+│   │       ├── rupture_response_windows.csv
+│   │       ├── sequential_response_summary.csv
+│   │       └── therapist_patient_pairs.csv
+│   └── SimulatedPatient2/
+│       └── ...
 └── README.md
 ```
 
-Each `SimulatedPatient*` directory is a self-contained analysis case. The JSON file contains the annotated transcript or ratings associated with that case, while the CSV files contain turn-level and aggregated results.
+The shared notebook is stored in `code/`. Each `data/SimulatedPatient*` directory contains one annotated JSON transcript and a generated results directory with the same name as the transcript stem. The generated directory contains the CSV tables and figures for that patient.
 
 ## Analysis workflow
 
 The notebook performs the following steps:
 
-1. Loads a transcript and its human annotations from Excel.
+1. Loads a JSON transcript and its human annotations into a pandas DataFrame.
 2. Normalizes column names and interaction-state labels.
 3. Extracts linguistic features with ELFen and spaCy.
 4. Computes sequential measures, including patient turn length relative to the preceding therapist turn.
@@ -53,7 +56,27 @@ The analysis distinguishes these interaction states:
 
 ## Input data
 
-The notebook currently reads an `.xlsx` workbook with one dialogue turn per row. It recognizes common variants of the following columns:
+The transcript files committed to this repository are JSON files, for example:
+
+```text
+SP1_transcript_psych_discourse_ratings.json
+SP2_transcript_psych_discourse_ratings.json
+```
+
+They use a record-oriented structure: each JSON object represents one dialogue turn. Load a transcript directly into a pandas DataFrame with:
+
+```python
+from pathlib import Path
+import pandas as pd
+
+transcript_path = Path(
+    "data/SimulatedPatient1/"
+    "SP1_transcript_psych_discourse_ratings.json"
+)
+df = pd.read_json(transcript_path)
+```
+
+The analysis expects the following information:
 
 | Required information | Accepted or expected column names |
 | --- | --- |
@@ -63,6 +86,11 @@ The notebook currently reads an `.xlsx` workbook with one dialogue turn per row.
 | Affiliation rating | A name containing `affiliation` |
 | Dominance rating | A name containing `dominance` |
 | Rupture strength | A name containing `rupture strength` |
+| Discourse uptake | A name containing `uptake` |
+| Elaboration | A name containing `elaboration` |
+| Grounding moves | A name containing `grounding moves` |
+| Metacommunication | A name containing `metacommunication` |
+| Relevance | A name containing `relevance` |
 
 Speaker values should be `Patient` or `Therapist`. Affiliation and dominance ratings must lie between `-1` and `1` when present.
 
@@ -88,7 +116,6 @@ python -m pip install \
   polars \
   matplotlib \
   seaborn \
-  openpyxl \
   spacy \
   wn \
   elfen
@@ -97,6 +124,19 @@ python -m spacy download en_core_web_sm
 ```
 
 ELFen may require additional lexical resources for some features. Follow the ELFen documentation for the version you install and ensure its resources are available before running the full extraction.
+
+The notebook looks for WordNet data in `wn_data/` at the current working directory by default. To use another location, set `WN_DATA_DIR` before starting Jupyter:
+
+```bash
+export WN_DATA_DIR="/path/to/wn_data"
+jupyter lab
+```
+
+The `wn_data/` directory should normally be excluded from Git if it contains downloaded resources:
+
+```gitignore
+wn_data/
+```
 
 ## Running an analysis
 
@@ -107,28 +147,33 @@ ELFen may require additional lexical resources for some features. Follow the ELF
    jupyter lab
    ```
 
-2. Open `run_discourse_analysis.ipynb` in the relevant simulated-patient directory.
+2. Open `code/run_analysis.ipynb`.
 
-3. In the data-loading cell, replace the hard-coded input path with the path to your annotated workbook:
-
-   ```python
-   excel_file_path = "path/to/annotated_transcript.xlsx"
-   ```
-
-4. If WordNet data is required, replace the machine-specific path with the location on your system:
+3. In the data-loading cell, select the JSON transcript for the simulated patient being analyzed:
 
    ```python
-   import os
-   os.environ["WN_DATA_DIR"] = "path/to/wn_data"
+   PROJECT_ROOT = Path.cwd()
+
+   # Jupyter commonly starts the kernel in the notebook's code/ directory.
+   if PROJECT_ROOT.name == "code":
+       PROJECT_ROOT = PROJECT_ROOT.parent
+
+   transcript_path = (
+       PROJECT_ROOT
+       / "data"
+       / "SimulatedPatient1"
+       / "SP1_transcript_psych_discourse_ratings.json"
+   )
    ```
+
+4. Make sure `WN_DATA_DIR` is set or a local `wn_data/` directory exists.
 
 5. Run the notebook from top to bottom.
 
-The notebook creates an output directory beside the workbook, using the workbook filename without its extension. For example:
+The notebook loads the JSON file with `pd.read_json()`, validates the annotations, and creates an output directory beside the transcript. For Patient 1, the generated files are written to:
 
 ```text
-annotated_transcript.xlsx
-annotated_transcript/
+data/SimulatedPatient1/SP1_transcript_psych_discourse_ratings/
 ```
 
 ## Main outputs
@@ -147,18 +192,26 @@ The current repository includes these analysis tables:
 | `rupture_response_windows.csv` | Local response windows around rupture events |
 | `sequential_response_summary.csv` | Aggregated sequential response measures |
 | `discourse_annotation_audit.csv` | Annotation coverage and consistency checks |
+| `figure1_plot_data.csv` | Data used for the linguistic phase-shift figure |
+| `figure1_individual_turn_data.csv` | Turn-level values shown in the phase analysis |
+| `figure2_plot_data.csv` | Affiliation and dominance coordinates used in the circumplex |
+| `figure4_plot_data.csv` | Data used for the discourse-profile figure |
+| `figure5_plot_data.csv` | Data used for the sequential-uptake figure |
 
-Depending on the notebook version, the generated figures may include:
+The notebook generates five figures:
 
-- linguistic phase shifts;
-- an interpersonal circumplex trajectory; and
-- a sequential rupture-repair timeline.
+1. Linguistic shifts from baseline to rupture and repair.
+2. Interpersonal positions and turn sequence in the affiliation-dominance circumplex.
+3. Sequential rupture-repair dynamics.
+4. Patient discourse features by clinical state.
+5. Patient uptake following therapist metacommunication.
 
 ## Reproducibility notes
 
 - Run all cells in order. Later cells depend on variables created during loading and feature extraction.
-- The notebook currently installs `openpyxl` from inside its first cell. For a reproducible environment, install dependencies before launching Jupyter and remove or skip that installation line.
-- The input workbook and WordNet locations are currently machine-specific and must be changed on a new system.
+- Keep the shared notebook in `code/` and select a case by changing `transcript_path` to the corresponding file under `data/`.
+- The current notebook still imports `openpyxl`, although the JSON workflow does not require it; that unused import can be removed.
+- WordNet data are configured through `WN_DATA_DIR`, with `./wn_data` as the default.
 - Standardized phase shifts can be unstable when only a few baseline patient turns are available. They should not be interpreted as significance tests.
 - Generated CSV and figure files may be overwritten when the notebook is rerun with the same input filename.
 
