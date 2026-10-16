@@ -2,7 +2,7 @@
 
 This repository contains transcript annotations, computational discourse analyses, and derived results for simulated psychotherapy dialogues. The project examines how linguistic behavior changes across baseline interaction, alliance rupture, and repair, and how these changes relate to interpersonal ratings such as affiliation and dominance.
 
-The analysis notebook uses [ELFen](https://github.com/gsarti/elfen) and other Python libraries to extract turn-level linguistic features and summarize phase shifts.
+The analysis notebook uses [ELFen](https://github.com/mmmaurer/elfen) and other Python libraries to extract turn-level linguistic features and summarize phase shifts.
 
 > **Research status:** This is an analysis repository for simulated-patient research. Its outputs are descriptive and exploratory; they are not clinical assessments or diagnostic tools.
 
@@ -41,7 +41,7 @@ The notebook performs the following steps:
 
 1. Loads a JSON transcript and its human annotations into a pandas DataFrame.
 2. Normalizes column names and interaction-state labels.
-3. Extracts linguistic features with ELFen and spaCy.
+3. Extracts linguistic features with ELFen and [spaCy](https://huggingface.co/spacy/en_core_web_sm).
 4. Computes sequential measures, including patient turn length relative to the preceding therapist turn.
 5. Compares patient language across baseline, rupture, and repair phases.
 6. Relates linguistic features to affiliation and dominance ratings.
@@ -104,7 +104,7 @@ python -m pip install \
 python -m spacy download en_core_web_sm
 ```
 
-ELFen may require additional lexical resources for some features. Follow the ELFen documentation for the version you install and ensure its resources are available before running the full extraction.
+ELFen may require additional lexical resources for some features. Follow the [ELFen documentation](https://elfen.readthedocs.io/en/latest/index.html) for the version you install and ensure its resources are available before running the full extraction.
 
 The notebook looks for WordNet data in `wn_data/` at the current working directory by default. To use another location, set `WN_DATA_DIR` before starting Jupyter:
 
