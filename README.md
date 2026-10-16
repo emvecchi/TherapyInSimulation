@@ -2,7 +2,7 @@
 
 This repository contains transcript annotations, computational discourse analyses, and derived results for simulated psychotherapy dialogues. The project examines how linguistic behavior changes across baseline interaction, alliance rupture, and repair, and how these changes relate to interpersonal ratings such as affiliation and dominance.
 
-The analysis notebook uses [ELFen](https://github.com/gsarti/elfen) and common Python data-science libraries to extract turn-level linguistic features, summarize phase shifts, and generate publication-ready figures and tables.
+The analysis notebook uses [ELFen](https://github.com/gsarti/elfen) and other Python libraries to extract turn-level linguistic features and summarize phase shifts.
 
 > **Research status:** This is an analysis repository for simulated-patient research. Its outputs are descriptive and exploratory; they are not clinical assessments or diagnostic tools.
 
@@ -45,7 +45,7 @@ The notebook performs the following steps:
 4. Computes sequential measures, including patient turn length relative to the preceding therapist turn.
 5. Compares patient language across baseline, rupture, and repair phases.
 6. Relates linguistic features to affiliation and dominance ratings.
-7. Exports analysis tables and publication-quality figures.
+7. Exports analysis tables and figures.
 
 The analysis distinguishes these interaction states:
 
@@ -62,18 +62,7 @@ SP1_transcript_psych_discourse_ratings.json
 SP2_transcript_psych_discourse_ratings.json
 ```
 
-They use a record-oriented structure: each JSON object represents one dialogue turn. Load a transcript directly into a pandas DataFrame with:
-
-```python
-from pathlib import Path
-import pandas as pd
-
-transcript_path = Path(
-    "data/SimulatedPatient1/"
-    "SP1_transcript_psych_discourse_ratings.json"
-)
-df = pd.read_json(transcript_path)
-```
+They use a record-oriented structure: each JSON object represents one dialogue turn. 
 
 The analysis expects the following information:
 
@@ -91,20 +80,13 @@ The analysis expects the following information:
 | Metacommunication | A name containing `metacommunication` |
 | Relevance | A name containing `relevance` |
 
-Speaker values should be `Patient` or `Therapist`. Affiliation and dominance ratings must lie between `-1` and `1` when present.
+Speaker values should be `Patient` or `Therapist`. Affiliation and dominance ratings must lie between `-1` and `1` (when present).
 
-Recognized rupture labels include baseline/none, withdrawal, confrontation, repair, resolution, and metacommunication. Several spelling variants are normalized automatically. Unexpected labels cause the notebook to stop rather than silently reclassify the data.
+Recognized rupture labels include baseline/none, withdrawal, confrontation, repair, resolution, and metacommunication. Several spelling variants are normalized automatically. 
 
 ## Installation
 
-Python 3.11 is recommended. Create and activate a virtual environment:
-
-```bash
-python3.11 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-```
-
+Python 3.11 is recommended.
 Install the analysis dependencies:
 
 ```bash
@@ -136,44 +118,7 @@ The `wn_data/` directory should normally be excluded from Git if it contains dow
 ```gitignore
 wn_data/
 ```
-
-## Running an analysis
-
-1. Activate the environment and start Jupyter:
-
-   ```bash
-   source .venv/bin/activate
-   jupyter lab
-   ```
-
-2. Open `code/run_analysis.ipynb`.
-
-3. In the data-loading cell, select the JSON transcript for the simulated patient being analyzed:
-
-   ```python
-   PROJECT_ROOT = Path.cwd()
-
-   # Jupyter commonly starts the kernel in the notebook's code/ directory.
-   if PROJECT_ROOT.name == "code":
-       PROJECT_ROOT = PROJECT_ROOT.parent
-
-   transcript_path = (
-       PROJECT_ROOT
-       / "data"
-       / "SimulatedPatient1"
-       / "SP1_transcript_psych_discourse_ratings.json"
-   )
-   ```
-
-4. Make sure `WN_DATA_DIR` is set or a local `wn_data/` directory exists.
-
-5. Run the notebook from top to bottom.
-
-The notebook loads the JSON file with `pd.read_json()`, validates the annotations, and creates an output directory beside the transcript. For Patient 1, the generated files are written to:
-
-```text
-data/SimulatedPatient1/SP1_transcript_psych_discourse_ratings/
-```
+Make sure `WN_DATA_DIR` is set or a local `wn_data/` directory exists.
 
 ## Main outputs
 
