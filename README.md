@@ -112,12 +112,6 @@ The notebook looks for WordNet data in `wn_data/` at the current working directo
 export WN_DATA_DIR="/path/to/wn_data"
 jupyter lab
 ```
-
-The `wn_data/` directory should normally be excluded from Git if it contains downloaded resources:
-
-```gitignore
-wn_data/
-```
 Make sure `WN_DATA_DIR` is set or a local `wn_data/` directory exists.
 
 ## Main outputs
